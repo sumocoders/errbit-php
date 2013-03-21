@@ -30,13 +30,27 @@
  */
 class Errbit_XmlBuilder {
 	/**
+	 * [DOMElement] that this Builder instance represents.
+	 */
+	protected $_xml;
+
+	/**
+	 * [DOMDocument] that this Element is a descendent of
+	 */
+	protected $_doc;
+
+	/**
 	 * Instantiate a new XmlBuilder.
 	 *
 	 * @param [SimpleXMLElement] $xml
 	 *   the parent node (only used internally)
 	 */
 	public function __construct($xml = null) {
-		$this->_xml = $xml ? $xml : new SimpleXMLElement('<__ErrbitXMLBuilder__/>');
+		if ($xml) {
+			$this->_xml = $xml;
+		} else {
+			$this->_doc = $this->_xml = new DOMDocument('1.0', 'UTF-8');
+		}
 	}
 
 	/**
@@ -61,7 +75,6 @@ class Errbit_XmlBuilder {
 		$value      = '';
 		$attributes = array();
 		$callback   = null;
-		$idx        = count($this->_xml->$name);
 		$args       = func_get_args();
 
 		array_shift($args);
@@ -77,20 +90,20 @@ class Errbit_XmlBuilder {
 			}
 		}
 
-		$this->_xml->{$name}[$idx] = $value;
+		$tag = $this->_doc->createElement($name, $value);
+		$builder = new self($tag);
+		$builder->_doc = $this->_doc;
 
 		foreach ($attributes as $attr => $v) {
-			$this->_xml->{$name}[$idx][$attr] = $v;
+			$tag->setAttribute($attr, $v);
 		}
-
-		// FIXME: This isn't the last child, it's the first, it just doesn't happen to matter in this project
-		$node = new self($this->_xml->$name);
+		$this->_xml->appendChild($tag);
 
 		if ($callback) {
-			$callback($node);
+			$callback($builder);
 		}
 
-		return $node;
+		return $builder;
 	}
 
 	/**
@@ -106,7 +119,7 @@ class Errbit_XmlBuilder {
 	 *   the current builder
 	 */
 	public function attribute($name, $value) {
-		$this->_xml[$name] = $value;
+		$this->_xml->setAttribute($name, $value);
 		return $this;
 	}
 
@@ -117,6 +130,6 @@ class Errbit_XmlBuilder {
 	 *   the XML of the document
 	 */
 	public function asXml() {
-		return $this->_xml->asXML();
+		return $this->_doc->saveXML($this->_xml);
 	}
 }
