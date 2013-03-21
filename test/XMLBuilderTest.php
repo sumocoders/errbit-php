@@ -11,8 +11,29 @@ class TestCase extends PHPUnit_Framework_TestCase {
 		$this->assertSame("<name key=\"val\">Tim</name>", $tag->asXml());
 	}
 
-	protected function tag($name, $value = null) {
+	public function testEscaping() {
+		$tag = $this->tag('name','<>');
+		$this->assertSame("<name>&lt;&gt;</name>", $tag->asXml());
+
+		$tag = $this->tag('name','Tim');
+		$tag->attribute("key",'"&');
+		$this->assertSame("<name key=\"&quot;&amp;\">Tim</name>", $tag->asXml());
+	}
+
+	public function testNestedTags() {
+		$tag = $this->tag('person', array('name' => 'Tim'), function($builder) {
+			$builder->tag("var", 123, array('key' => 'age'));
+		});
+		$expected =
+			'<person name="Tim">'.
+				'<var key="age">123</var>'.
+			'</person>';
+		$this->assertSame($expected, $tag->asXml());
+	}
+
+	protected function tag() {
 		$root = new Errbit_XmlBuilder();
-		return $root->tag($name, $value);
+		return call_user_func_array(
+			array($root, 'tag'), func_get_args());
 	}
 }
