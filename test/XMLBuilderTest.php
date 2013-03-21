@@ -9,6 +9,12 @@ class TestCase extends PHPUnit_Framework_TestCase {
 
 		$tag->attribute("key","val");
 		$this->assertSame("<name key=\"val\">Tim</name>", $tag->asXml());
+
+		$tag = $this->tag('name','head');
+		$this->assertSame("<name>head</name>", $tag->asXml());
+
+		$tag = $this->tag('name','array_shift');
+		$this->assertSame("<name>array_shift</name>", $tag->asXml());
 	}
 
 	public function testEscaping() {

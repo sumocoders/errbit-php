@@ -66,7 +66,7 @@ class Errbit_XmlBuilder {
 
 		array_shift($args);
 		foreach ($args as $arg) {
-			if (is_callable($arg)) {
+			if (is_a($arg, 'Closure')) {
 				$callback = $arg;
 			} elseif (is_array($arg)) {
 				$attributes = $arg;
