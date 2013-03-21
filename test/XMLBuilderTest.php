@@ -35,6 +35,41 @@ class TestCase extends PHPUnit_Framework_TestCase {
 				'<var key="age">123</var>'.
 			'</person>';
 		$this->assertSame($expected, $tag->asXml());
+
+		$tag = $this->tag('b', array('k' => 'i'), function($builder) {
+			$builder->tag('b', 'Tim', array('k' => 'v'));
+			$builder->tag('b', array('k' => 'x'), function($builder) {
+				$builder->tag('b', 10);
+			});
+		});
+		$expected =
+			'<b k="i">'.
+				'<b k="v">Tim</b>'.
+				'<b k="x">'.
+					'<b>10</b>'.
+				'</b>'.
+			'</b>';
+		$this->assertSame($expected, $tag->asXml());
+	}
+
+	public function testXmlVarsFor() {
+		$input = array (
+		  'name' => 'Tim',
+		  'info' =>
+		  array (
+			 'age' => 10
+		  )
+		);
+		$tag = $this->tag('notice');
+		Errbit_Notice::xmlVarsFor($tag, $input);
+		$expected =
+			'<notice>'.
+				'<var key="name">Tim</var>'.
+				'<var key="info">'.
+					'<var key="age">10</var>'.
+				'</var>'.
+			'</notice>';
+		$this->assertSame($expected, $tag->asXml());
 	}
 
 	protected function tag() {
