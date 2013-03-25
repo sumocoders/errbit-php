@@ -26,6 +26,25 @@ class TestCase extends PHPUnit_Framework_TestCase {
 		$this->assertSame("<name key=\"&quot;&amp;\">Tim</name>", $tag->asXml());
 	}
 
+	/**
+	 * The underlying DOMDocument was for some reason trying to parse the tag
+	 * content as XML and if it saw an unterminated entity reference
+	 * (like '&am') would throw an exception. 
+	 *
+	 * This test ensures the "value" part can be anything
+	 */
+	public function testPartialEscaping() {
+		$tag = $this->tag('name','&am<&lt');
+		$this->assertSame("<name>&amp;am&lt;&amp;lt</name>", $tag->asXml());
+
+		$tag = $this->tag('name','<a></a>');
+		$this->assertSame("<name>&lt;a&gt;&lt;/a&gt;</name>", $tag->asXml());
+
+		$tag = $this->tag('name','Tim');
+		$tag->attribute("key",'"&&amp;');
+		$this->assertSame("<name key=\"&quot;&amp;&amp;amp;\">Tim</name>", $tag->asXml());
+	}
+
 	public function testNestedTags() {
 		$tag = $this->tag('person', array('name' => 'Tim'), function($builder) {
 			$builder->tag("var", 123, array('key' => 'age'));

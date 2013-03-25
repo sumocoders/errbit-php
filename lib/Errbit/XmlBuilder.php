@@ -10,9 +10,6 @@
 /**
  * Like Nokogiri, but shittier.
  *
- * SimpleXML's addChild() and friends don't escape the XML, so this wraps
- * simplexml in a very specific way.
- *
  * Lambdas are used to construct a full tree of XML.
  *
  * @example
@@ -90,7 +87,8 @@ class Errbit_XmlBuilder {
 			}
 		}
 
-		$tag = $this->_doc->createElement($name, $value);
+		$tag = $this->_doc->createElement($name,
+		 htmlspecialchars($value, ENT_QUOTES));
 		$builder = new self($tag);
 		$builder->_doc = $this->_doc;
 
