@@ -18,6 +18,15 @@ so you need to install it locally.
 
     git clone git://github.com/flippa/errbit-php.git
 
+### Composer
+
+Just add the line below into your composer.json-file in the require-part:
+
+	"flippa-official/errbit-php": "dev-master"
+
+If you use the line above you won't need to require anything, everything will
+be autoloaded through the composer-autoloader
+
 ## Usage
 
 The intended way to use the notifier is as a singleton, though this is not
