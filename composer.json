@@ -1,0 +1,15 @@
+{
+	"name": "flippa-official/errbit-php",
+	"type": "library",
+	"description": "Errbit & Airbrake Client for PHP",
+	"homepage": "https://github.com/flippa/errbit-php",
+	"license": "MIT",
+	"require": {
+		"php": ">=5.3.0",
+		"ext-curl": "*"
+	},
+	"target-dir": "Flippa/ErrbitPhp",
+	"autoload": {
+		"classmap": ["lib/"]
+	}
+}
