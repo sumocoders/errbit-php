@@ -16,17 +16,17 @@
  */
 class Errbit_Errors_Base {
 	private $_message;
-	private $_line;
 	private $_file;
+	private $_line;
 	private $_trace;
 
 	/**
 	 * Create a new error wrapping the given error context info.
 	 */
-	public function __construct($message, $line, $file, $trace) {
+	public function __construct($message, $file, $line, $trace) {
 		$this->_message = $message;
-		$this->_line    = $line;
 		$this->_file    = $file;
+		$this->_line    = $line;
 		$this->_trace   = $trace;
 	}
 
