@@ -11,7 +11,7 @@ class Errbit_Errors_Fatal extends Errbit_Errors_Base {
 	/**
 	 * Create a new fatal error wrapping the given error context info.
 	 */
-	public function __construct($message, $line, $file) {
+	public function __construct($message, $file, $line) {
 		parent::__construct(
 			$message,
 			$line,
