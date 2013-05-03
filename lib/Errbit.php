@@ -149,21 +149,14 @@ class Errbit {
 	 *   the current instance
 	 */
 	public function notify($exception, $options = array()) {
+		$this->_checkConfig();
+
 		$config = array_merge($this->_config, $options);
 
-		$ch = curl_init();
-		curl_setopt_array($ch, array(
-			CURLOPT_URL            => $this->_buildApiUrl(),
-			CURLOPT_HEADER         => true,
-			CURLOPT_POST           => true,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_POSTFIELDS     => $this->_buildNoticeFor($exception, $config),
-			CURLOPT_HTTPHEADER     => array(
-				'Content-Type: text/xml',
-				'Accept: text/xml, application/xml'
-			)
-		));
-		curl_exec($ch);
+		if ($sock = fsockopen($this->_buildTcpScheme($config), $config['port'])) {
+			fwrite($sock, $this->_buildHttpPayload($exception, $config));
+			fclose($sock);
+		}
 
 		foreach ($this->_observers as $observer) {
 			$observer($exception, $config);
@@ -207,6 +200,10 @@ class Errbit {
 			$this->_config['params_filters'] = array('/password/');
 		}
 
+		if (!isset($this->_config['agent'])) {
+			$this->_config['agent'] = 'errbit-php';
+		}
+
 		if (!isset($this->_config['backtrace_filters'])) {
 			$this->_config['backtrace_filters'] = array(
 				sprintf('/^%s/', preg_quote($this->_config['project_root'], '/')) => '[PROJECT_ROOT]'
@@ -214,16 +211,37 @@ class Errbit {
 		}
 	}
 
-	private function _buildApiUrl() {
-		$this->_checkConfig();
-		return implode(
-			'',
-			array(
-				$this->_config['secure'] ? 'https://' : 'http://',
-				$this->_config['host'],
-				':' . $this->_config['port'],
-				self::NOTICES_PATH
-			)
+	private function _buildTcpScheme($config) {
+		return sprintf(
+			'%s://%s',
+			$config['secure'] ? 'ssl' : 'tcp',
+			$config['host']
+		);
+	}
+
+	private function _buildHttpPayload($exception, $config) {
+		return $this->_addHttpHeaders(
+			$this->_buildNoticeFor($exception, $config),
+			$config
+		);
+	}
+
+	private function _addHttpHeaders($body, $config) {
+		return sprintf(
+			"%s\r\n\r\n%s",
+			implode(
+				"\r\n",
+				array(
+					sprintf('POST %s HTTP/1.1',   self::NOTICES_PATH),
+					sprintf('Host: %s',           $config['host']),
+					sprintf('User-Agent: %s',     $config['agent']),
+					sprintf('Content-Type: %s',   'text/xml'),
+					sprintf('Accept: %s',         'text/xml, application/xml'),
+					sprintf('Content-Length: %d', strlen($body)),
+					sprintf('Connection: %s',     'close')
+				)
+			),
+			$body
 		);
 	}
 
