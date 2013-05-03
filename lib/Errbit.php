@@ -153,7 +153,15 @@ class Errbit {
 
 		$config = array_merge($this->_config, $options);
 
-		if ($sock = fsockopen($this->_buildTcpScheme($config), $config['port'])) {
+		$sock = fsockopen(
+			$this->_buildTcpScheme($config),
+			$config['port'],
+			$errno, $errstr,
+			$config['connect_timeout']
+		);
+
+		if ($sock) {
+			stream_set_timeout($sock, $config['write_timeout']);
 			fwrite($sock, $this->_buildHttpPayload($exception, $config));
 			fclose($sock);
 		}
@@ -202,6 +210,14 @@ class Errbit {
 
 		if (!isset($this->_config['agent'])) {
 			$this->_config['agent'] = 'errbit-php';
+		}
+
+		if (!isset($this->_config['connect_timeout'])) {
+			$this->_config['connect_timeout'] = 3;
+		}
+
+		if (!isset($this->_config['write_timeout'])) {
+			$this->_config['write_timeout'] = 3;
 		}
 
 		if (!isset($this->_config['backtrace_filters'])) {
