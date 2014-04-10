@@ -1,5 +1,5 @@
 {
-	"name": "flippa-official/errbit-php",
+	"name": "kelemen/errbit-php",
 	"type": "library",
 	"description": "Errbit & Airbrake Client for PHP",
 	"homepage": "https://github.com/flippa/errbit-php",
