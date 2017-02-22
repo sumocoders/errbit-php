@@ -11,5 +11,8 @@
 	"target-dir": "Flippa/ErrbitPhp",
 	"autoload": {
 		"classmap": ["lib/"]
+	},
+	"replace": {
+		"flippa-official/errbit-php":"dev-master"
 	}
 }
