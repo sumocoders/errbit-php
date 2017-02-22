@@ -1,5 +1,7 @@
 # Errbit & Airbrake Client for PHP
 
+    Since flippa deleted his repository we republished it so we can keep using it
+
 This is a full-featured client to add integration with Errbit (or Airbrake)
 to any PHP >= 5.3 application.
 
@@ -16,13 +18,13 @@ self-hosted Airbrake-compatible application).
 We haven't put this in PEAR or anything like that (please feel to contribute)
 so you need to install it locally.
 
-    git clone git://github.com/flippa/errbit-php.git
+    git clone git@github.com:sumocoders/errbit-php.git
 
 ### Composer
 
 Just add the line below into your composer.json-file in the require-part:
 
-	"flippa-official/errbit-php": "dev-master"
+	composer require sumocoders/errbit-php
 
 If you use the line above you won't need to require anything, everything will
 be autoloaded through the composer-autoloader
